@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    container_name: burh_app
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    command: php-fpm
+
+  web:
+    image: nginx:alpine
+    container_name: burh_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: burh_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    ports:
+      - "3306:3306"
