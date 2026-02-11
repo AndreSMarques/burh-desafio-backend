@@ -10,12 +10,13 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+   {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('cpf')->unique();
-            $table->integer('age');
-        });
+            $table->string('cpf')->unique()->nullable();
+            $table->integer('age')->nullable();
+        }); 
     }
+
 
     /**
      * Reverse the migrations.
@@ -23,7 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn('cpf');
+            $table->dropColumn('age');
         });
     }
 };

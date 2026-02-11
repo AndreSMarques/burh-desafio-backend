@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('job_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('resume')->nullable();
             $table->timestamps();
 
             $table->unique(['job_id', 'user_id']); // evita candidatura duplicada

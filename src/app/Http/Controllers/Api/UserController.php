@@ -3,47 +3,50 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return User::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'cpf' => 'required|string|unique:users,cpf',
+            'age' => 'required|integer',
+            'password' => 'required|string',
+        ]);
+
+        $data['password'] = bcrypt($data['password']);
+        $user = User::create($data);
+        return response()->json($user, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function search(Request $request)
     {
-        //
-    }
+        $query = User::query();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if ($request->has('name')) {
+            $query->where('name', 'like', "%{$request->name}%");
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if ($request->has('email')) {
+            $query->where('email', $request->email);
+        }
+
+        if ($request->has('cpf')) {
+            $query->where('cpf', $request->cpf);
+        }
+
+        
+        $users = $query->with(['applications.job.company'])->get();
+
+        return response()->json($users);
     }
 }
