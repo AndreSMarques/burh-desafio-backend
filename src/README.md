@@ -1,59 +1,181 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Desafio Backend BURH
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Introdução
+Este projeto é uma API Restful desenvolvida em PHP com Laravel, para cadastro de vagas de emprego e candidatura de usuários. O objetivo é atender ao desafio da vaga de **Desenvolvedor(a) Backend PHP** publicada no BURH.
 
-## About Laravel
+A API permite:
+- Empresas criarem vagas;
+- Usuários se candidatarem às vagas;
+- Consultar usuários e suas candidaturas.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tecnologias Utilizadas
+- PHP 8.2
+- Laravel 12
+- MySQL
+- Docker & Docker Compose (para facilitar o ambiente de desenvolvimento)
+- Eloquent ORM
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Estrutura do Projeto
+O projeto contém as seguintes entidades:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Empresa
+Campos:  
+- `name` (string)  
+- `description` (text)  
+- `cnpj` (string, único)  
+- `plan` (enum: Free ou Premium)  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Regras:
+- Empresas com plano Free podem criar até 5 vagas.
+- Empresas com plano Premium podem criar até 10 vagas.
 
-## Laravel Sponsors
+### Vaga
+Campos:  
+- `title` (string)  
+- `description` (text)  
+- `type` (enum: pj, clt, internship)  
+- `salary` (decimal)  
+- `workload` (integer)  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Regras:
+- CLT: salário mínimo R$1212 e workload obrigatório.
+- Estágio: workload máximo 6 horas.
+- PJ: não há salário mínimo ou limite de workload.
 
-### Premium Partners
+### Usuário
+Campos:  
+- `name` (string)  
+- `email` (string, único)  
+- `cpf` (string, único)  
+- `age` (integer)  
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Funcionalidades
+- Empresas podem criar vagas.
+- Usuários podem se candidatar a vagas.
+- Busca de usuários por `name`, `email` ou `cpf`, incluindo todas as vagas em que estão inscritos.
+- Tratamento de limites de vagas por plano e validações por tipo de vaga.
+- Nenhuma autenticação é necessária.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Rotas da API
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Empresas
+| Método | Rota                 | Descrição           |
+|--------|--------------------|-------------------|
+| GET    | /api/companies      | Lista empresas     |
+| POST   | /api/companies      | Cria empresa       |
+| GET    | /api/companies/{id} | Detalha empresa    |
+| PUT    | /api/companies/{id} | Atualiza empresa   |
+| DELETE | /api/companies/{id} | Remove empresa     |
 
-## Security Vulnerabilities
+### Vagas
+| Método | Rota           | Descrição            |
+|--------|----------------|--------------------|
+| GET    | /api/jobs      | Lista vagas         |
+| POST   | /api/jobs      | Cria vaga           |
+| GET    | /api/jobs/{id} | Detalha vaga        |
+| PUT    | /api/jobs/{id} | Atualiza vaga       |
+| DELETE | /api/jobs/{id} | Remove vaga         |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Usuários
+| Método | Rota               | Descrição                 |
+|--------|------------------|--------------------------|
+| GET    | /api/users        | Lista usuários           |
+| POST   | /api/users        | Cria usuário             |
+| GET    | /api/users/{id}   | Detalha usuário          |
+| PUT    | /api/users/{id}   | Atualiza usuário         |
+| DELETE | /api/users/{id}   | Remove usuário           |
+| GET    | /api/users/search | Busca usuários (filtro por name, email ou cpf) |
 
-## License
+### Candidaturas
+| Método | Rota                    | Descrição                     |
+|--------|------------------------|-------------------------------|
+| GET    | /api/applications       | Lista candidaturas            |
+| POST   | /api/applications       | Cria candidatura (user → vaga) |
+| GET    | /api/applications/{id}  | Detalha candidatura           |
+| PUT    | /api/applications/{id}  | Atualiza candidatura          |
+| DELETE | /api/applications/{id}  | Remove candidatura            |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Exemplos de Uso (Postman)
+### Criar Usuário
+```json
+POST /api/users
+{
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "cpf": "12345678901",
+    "age": 25
+}
+```
+
+### Criar Empresa
+```json
+POST /api/companies
+{
+    "name": "Tech Company",
+    "description": "Empresa de tecnologia",
+    "cnpj": "12345678000199",
+    "plan": "Free"
+}
+```
+
+### Criar Vaga
+```json
+POST /api/jobs
+{
+    "company_id": 1,
+    "title": "Desenvolvedor Backend",
+    "description": "Vaga para Laravel",
+    "type": "clt",
+    "salary": 2500,
+    "workload": 8
+}
+```
+
+### Candidatar-se a Vaga
+```json
+POST /api/applications
+{
+    "user_id": 1,
+    "job_id": 1,
+    "resume": "https://meucv.com/cv.pdf"
+}
+```
+
+### Buscar Usuário e suas Vagas
+```
+GET /api/users/search?name=João
+```
+
+---
+
+## Setup do Projeto
+
+### Com Docker
+```bash
+docker compose build
+docker compose up -d
+docker compose exec app php artisan migrate:fresh
+```
+
+### Sem Docker
+1. Instale PHP, Composer e MySQL
+2. Configure o `.env` com seu banco
+3. Execute:
+```bash
+composer install
+php artisan migrate:fresh
+php artisan serve
+```
+
+---
+
